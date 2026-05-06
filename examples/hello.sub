@@ -1,0 +1,13 @@
+# Minimal test: runs hostname on 5 machines.
+# Submit with: condor_submit hello.sub
+
+universe   = vanilla
+executable = /bin/hostname
+output     = hello.$(ClusterId).$(ProcId).out
+error      = hello.$(ClusterId).$(ProcId).err
+log        = hello.log
+
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+
+queue 5

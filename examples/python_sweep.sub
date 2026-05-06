@@ -1,0 +1,20 @@
+# Parameter sweep: runs a Python script with different hyperparameters.
+# Create params.txt first, then: condor_submit python_sweep.sub
+
+universe   = vanilla
+executable = /usr/bin/python3
+arguments  = train.py --lr $(lr) --batch $(batch) --seed $(seed) --output result_$(ClusterId)_$(ProcId).json
+
+transfer_input_files    = train.py
+transfer_output_files   = result_$(ClusterId)_$(ProcId).json
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+
+output = logs/$(ClusterId).$(ProcId).out
+error  = logs/$(ClusterId).$(ProcId).err
+log    = sweep.log
+
+request_cpus   = 1
+request_memory = 4G
+
+queue lr, batch, seed from params.txt
