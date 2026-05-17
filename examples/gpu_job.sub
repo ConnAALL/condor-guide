@@ -18,6 +18,5 @@ log    = gpu.log
 request_cpus   = 4
 request_memory = 16G
 request_gpus   = 1
-requirements   = (CUDACapability >= 7.5)
 
 queue 1
