@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import os
+import shutil
+import sys
+from pathlib import Path
+
+
+def _remote_command(arguments: list[str]) -> list[str]:
+    command = ["ssh"]
+    if "--snapshot" not in arguments and "--help" not in arguments and "-h" not in arguments and "--version" not in arguments:
+        command.append("-t")
+    key = Path(
+        os.environ.get("AALL_CLUSTER_KEY", "~/.ssh/aall_id_ed25519")
+    ).expanduser()
+    if key.is_file():
+        command.extend(["-i", str(key)])
+    command.extend(
+        [
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            "ConnectTimeout=10",
+            os.environ.get("AALL_CLUSTER_HOST", "aall@136.244.224.136"),
+            os.environ.get(
+                "AALL_CLUSTER_REMOTE_COMMAND",
+                "/home/aall/.local/bin/aall-cluster",
+            ),
+            *arguments,
+        ]
+    )
+    return command
+
+
+def main() -> int:
+    arguments = sys.argv[1:]
+    if shutil.which("condor_q") is None:
+        command = _remote_command(arguments)
+        os.execvp(command[0], command)
+    from aall_cluster.__main__ import main as package_main
+
+    return package_main(arguments)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
